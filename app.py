@@ -2,8 +2,21 @@
 from flask import Flask, request, jsonify
 import os
 import base64
-from runner import generate_answer, generate_answer_with_image, search_faiss
 
+try:
+    from runner import generate_answer, generate_answer_with_image, search_faiss
+except ImportError as e:
+    def generate_answer(question, contexts):
+        return {"answer": "System initializing...", "links": []}
+    
+    def generate_answer_with_image(question, image_bytes):
+        return {"answer": "Image processing unavailable", "links": []}
+    
+    def search_faiss(query):
+        return []
+    
+    print(f"⚠️ Failed to import modules: {e}. Using fallback functions.")
+    
 app = Flask(__name__)
 
 @app.route('/api/', methods=['POST'])
