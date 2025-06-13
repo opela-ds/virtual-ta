@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 python-3.9.7
+=======
+python-3.9.7
+>>>>>>> bbb952c19b9b9a73725337ae9f1a8d118b22bc9c

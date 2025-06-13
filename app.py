@@ -1,8 +1,21 @@
-# app.py
 from flask import Flask, request, jsonify
 import os
 import base64
-from runner import generate_answer, generate_answer_with_image, search_faiss
+
+# Import with error handling
+try:
+    from runner import generate_answer, generate_answer_with_image, search_faiss
+except ImportError as e:
+    def generate_answer(question, contexts):
+        return {"answer": "System initializing...", "links": []}
+    
+    def generate_answer_with_image(question, image_bytes):
+        return {"answer": "Image processing unavailable", "links": []}
+    
+    def search_faiss(query):
+        return []
+    
+    print(f"⚠️ Failed to import modules: {e}. Using fallback functions.")
 
 app = Flask(__name__)
 
@@ -29,4 +42,5 @@ def virtual_ta():
         }), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    port = int(os.environ.get("PORT", 5000))  # Critical for Render
+    app.run(host='0.0.0.0', port=port)
