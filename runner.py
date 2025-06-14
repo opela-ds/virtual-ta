@@ -6,15 +6,23 @@ import numpy as np
 from PIL import Image
 from openai import OpenAI
 
-from faiss_setup import model, index, metadata  # ← New
+from faiss_setup import load_resources
 
 client = OpenAI(
     api_key="eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjI0ZjEwMDE3NTBAZHMuc3R1ZHkuaWl0bS5hYy5pbiJ9.v85lE2a1QBW-INTFrcyVHeiDHA5bHBqxf9cxwVlLtqE",
     base_url="https://aipipe.org/openai/v1"
 )
 
+model = index = metadata = None
+
+def ensure_loaded():
+    global model, index, metadata
+    if model is None:
+        model, index, metadata = load_resources()
+
 # FAISS search (assumes model, index, and metadata are already loaded)
 def search_faiss(query, top_k=5):
+    ensure_loaded()
     query_vec = model.encode([query])
     scores, indices = index.search(np.array(query_vec).astype("float32"), top_k)
     results = []
