@@ -19,6 +19,10 @@ except ImportError as e:
 
 app = Flask(__name__)
 
+@app.route("/", methods=["GET"])
+def index():
+    return jsonify({"message": "Virtual TA API is running. POST to /api/"}), 200
+
 @app.route('/api/', methods=['POST'])
 def virtual_ta():
     try:
