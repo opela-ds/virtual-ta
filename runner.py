@@ -6,7 +6,7 @@ import numpy as np
 from PIL import Image
 from openai import OpenAI
 
-from faiss_setup import load_resources
+from openai_search import search_openai_embeddings
 
 client = OpenAI(
     api_key="eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjI0ZjEwMDE3NTBAZHMuc3R1ZHkuaWl0bS5hYy5pbiJ9.v85lE2a1QBW-INTFrcyVHeiDHA5bHBqxf9cxwVlLtqE",
@@ -15,23 +15,25 @@ client = OpenAI(
 
 model = index = metadata = None
 
-def ensure_loaded():
+'''def ensure_loaded():
     print("🔄 Loading model and FAISS index...")
 
     global model, index, metadata
     if model is None:
-        model, index, metadata = load_resources()
+        model, index, metadata = load_resources()'''
 
 # FAISS search (assumes model, index, and metadata are already loaded)
 def search_faiss(query, top_k=5):
-    ensure_loaded()
+    '''ensure_loaded()
     query_vec = model.encode([query])
     scores, indices = index.search(np.array(query_vec).astype("float32"), top_k)
     results = []
     for i in indices[0]:
         if str(i) in metadata:
             results.append(metadata[str(i)])
-    return results
+    return results'''
+    return search_openai_embeddings(query, top_k)
+
 
 # Answer generation for TEXT-ONLY (returns full JSON object)
 def generate_answer(query, contexts):
@@ -179,4 +181,4 @@ with open("project-tds-virtual-ta-promptfoo.yaml", "r") as f:
     test_cases = yaml.safe_load(f)["tests"]
 
 # Run tests
-#evaluate_tests_with_images(test_cases)
+evaluate_tests_with_images(test_cases)

@@ -42,6 +42,13 @@ def index():
 # Main API endpoint
 @app.route('/api/', methods=['POST', 'OPTIONS'])
 def virtual_ta():
+    if request.method == "OPTIONS":
+        return "", 200, {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type"
+        }
+
     try:
         data = request.get_json()
         question = data.get('question', '')
@@ -51,16 +58,12 @@ def virtual_ta():
             image_bytes = base64.b64decode(image_b64)
             response = generate_answer_with_image(question, image_bytes)
         else:
-            # Temporarily disable FAISS for free-tier memory limits
-            # contexts = search_faiss(question)
-            # response = generate_answer(question, contexts)
+            contexts = search_faiss(question)
+            response = generate_answer(question, contexts)
 
-            response = {
-                "answer": f"You asked: {question}. (Note: FAISS is disabled for this demo)",
-                "links": []
-            }
-
-        return jsonify(response)
+        return jsonify(response), 200, {
+            "Access-Control-Allow-Origin": "*"
+        }
 
     except Exception as e:
         logging.exception("Error handling request:")
@@ -68,6 +71,7 @@ def virtual_ta():
             "answer": f"Error processing request: {str(e)}",
             "links": []
         }), 500
+
 
 # Port binding for Render
 if __name__ == '__main__':
