@@ -38,9 +38,13 @@ def virtual_ta():
             image_bytes = base64.b64decode(image_b64)
             response = generate_answer_with_image(question, image_bytes)
         else:
-            contexts = search_faiss(question)
-            response = generate_answer(question, contexts)
             
+            #contexts = search_faiss(question)
+            #response = generate_answer(question, contexts)
+            response = {
+                "answer": f"You asked: {question}. FAISS is disabled on free tier.",
+                "links": []
+            }
         return jsonify(response)
     
     except Exception as e:
