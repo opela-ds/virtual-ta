@@ -8,30 +8,36 @@ client = OpenAI(
     base_url="https://aipipe.org/openai/v1"
 )
 
-# Load metadata and precomputed OpenAI embeddings
-with open("index_to_data.json", "r", encoding="utf-8") as f:
-    metadata = json.load(f)
+# Delay loading until first use
+metadata = None
+embeddings = None
 
-with open("openai_embeddings.npy", "rb") as f:
-    vectors = np.load(f)
+def load_index():
+    global metadata, embeddings
 
-texts = [metadata[str(i)] for i in range(len(metadata))]
+    if metadata is not None and embeddings is not None:
+        return  # Already loaded
 
-def cosine_similarity(a, b):
-    a = a / np.linalg.norm(a)
-    b = b / np.linalg.norm(b, axis=1, keepdims=True)
-    return np.dot(b, a)
+    print("🔄 Loading OpenAI embedding index...")
+    with open("index_to_data.json", "r", encoding="utf-8") as f:
+        metadata = json.load(f)
+    embeddings = np.load("openai_embeddings.npy")
+
+def cosine_similarity(query_vec, embedding_matrix):
+    query_vec = query_vec / np.linalg.norm(query_vec)
+    embedding_matrix = embedding_matrix / np.linalg.norm(embedding_matrix, axis=1, keepdims=True)
+    return np.dot(embedding_matrix, query_vec)
 
 def search_openai_embeddings(query, top_k=5):
-    # Get query embedding from OpenAI
+    load_index()
+
     response = client.embeddings.create(
-        model="text-embedding-3-small",  # or text-embedding-ada-002
+        model="text-embedding-3-small",
         input=query
     )
     query_vec = np.array(response.data[0].embedding)
 
-    # Compute cosine similarity
-    sims = cosine_similarity(query_vec, vectors)
-    top_indices = sims.argsort()[-top_k:][::-1]
+    similarities = cosine_similarity(query_vec, embeddings)
+    top_indices = similarities.argsort()[-top_k:][::-1]
 
-    return [texts[i] for i in top_indices]
+    return [metadata[str(i)] for i in top_indices if str(i) in metadata]
