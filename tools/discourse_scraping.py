@@ -5,7 +5,7 @@ from tqdm import tqdm
 import json
 
 # Your session cookie (_t value only, not the full cookie header)
-DISCOURSE_COOKIE = #add your cookie here for login.
+DISCOURSE_COOKIE = "TEMPCOOKIE"
 
 session = requests.Session()
 session.cookies.set("_t", DISCOURSE_COOKIE, domain="discourse.onlinedegree.iitm.ac.in")
