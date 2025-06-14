@@ -18,6 +18,10 @@ except ImportError as e:
     print(f"⚠️ Failed to import modules: {e}. Using fallback functions.")
 
 app = Flask(__name__)
+import logging
+logging.basicConfig(level=logging.DEBUG)
+print("✅ Flask app initialized")
+
 
 @app.route("/", methods=["GET"])
 def index():

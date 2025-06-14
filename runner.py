@@ -16,6 +16,8 @@ client = OpenAI(
 model = index = metadata = None
 
 def ensure_loaded():
+    print("🔄 Loading model and FAISS index...")
+
     global model, index, metadata
     if model is None:
         model, index, metadata = load_resources()
