@@ -42,5 +42,5 @@ def virtual_ta():
         }), 500
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))  # Critical for Render
+    port = int(os.environ.get("PORT", 10000))  # Critical for Render
     app.run(host='0.0.0.0', port=port)
